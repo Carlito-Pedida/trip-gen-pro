@@ -62,7 +62,7 @@ const NavItems = ({ handleClick }: { handleClick?: () => void }) => {
               src="/assets/icons/logout.svg"
               alt="logout"
               className="size-6"
-            ></img>
+            />
           </button>
         </footer>
       </div>
