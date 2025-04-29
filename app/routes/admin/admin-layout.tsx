@@ -6,12 +6,14 @@ import { MobileSidebar, NavItems } from "components";
 const AdminLayout = () => {
   return (
     <div className="admin-layout">
-      <MobileSidebar />{" "}
-      <aside className="w-full max-x-[270px] hidden lg:block">
+      <MobileSidebar />
+
+      <aside className="w-full max-w-[270px] hidden lg:block">
         <SidebarComponent width={270} enableGestures={false}>
           <NavItems />
         </SidebarComponent>
-      </aside>{" "}
+      </aside>
+
       <aside className="children">
         <Outlet />
       </aside>
