@@ -1,13 +1,11 @@
 import { Query } from "appwrite";
-import { totalmem } from "os";
 import { appwriteConfig, database } from "~/appwrite/client";
 
 export const getAllTrips = async (limit: number, offset: number) => {
   const allTrips = await database.listDocuments(
     appwriteConfig.databaseId,
-    appwriteConfig.tripsCollectionId[
-      (Query.limit(limit), Query.offset(offset), Query.orderDesc("createAt"))
-    ]
+    appwriteConfig.tripsCollectionId,
+    [(Query.limit(limit), Query.offset(offset), Query.orderDesc("createdAt"))]
   );
 
   if (allTrips.total === 0) {

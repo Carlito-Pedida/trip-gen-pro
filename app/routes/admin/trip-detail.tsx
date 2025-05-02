@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { getTripById } from "~/appwrite/trips";
+import { getAllTrips, getTripById } from "~/appwrite/trips";
 import type { Route } from "./+types/trip-detail";
 import { cn, getFirstWord, parseTripData } from "~/lib/utils";
-import { Header, InfoPill } from "components";
+import { Header, InfoPill, TripCard } from "components";
 
 import {
   ChipDirective,
@@ -15,12 +15,24 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   if (!tripId) throw new Error("Trip ID is required");
 
-  return await getTripById(tripId);
+  const [trip, trips] = await Promise.all([
+    getTripById(tripId),
+    getAllTrips(4, 0)
+  ]);
+
+  return {
+    trip,
+    allTrips: trips.allTrips.map(({ $id, tripDetail, imageUrls }) => ({
+      id: $id,
+      ...parseTripData(tripDetail),
+      imageUrls: imageUrls ?? []
+    }))
+  };
 };
 
 const TripDetail = ({ loaderData }: Route.ComponentProps) => {
-  const imageUrls = loaderData?.imageUrls || [];
-  const tripData = parseTripData(loaderData?.tripDetail);
+  const imageUrls = loaderData?.trip?.imageUrls || [];
+  const tripData = parseTripData(loaderData?.trip?.tripDetail);
 
   const {
     name,
@@ -30,17 +42,30 @@ const TripDetail = ({ loaderData }: Route.ComponentProps) => {
     groupType,
     budget,
     interests,
+    description,
     estimatedPrice,
     bestTimeToVisit,
     weatherInfo,
     country
   } = tripData || {};
+  const allTrips = loaderData.allTrips as Trip[] | [];
 
   const pillItems = [
     { text: travelStyle, bg: "!bg-pink-50 !text-pink-500" },
     { text: groupType, bg: "!bg-primary-50 !text-primary-500" },
     { text: budget, bg: "!bg-success-50 !text-success-700" },
     { text: interests, bg: "!bg-navy-50 !text-navy-500" }
+  ];
+
+  const vistTimeAndWeatherInfo = [
+    {
+      title: "Best Time To Visit:",
+      items: bestTimeToVisit
+    },
+    {
+      title: "Weather",
+      items: weatherInfo
+    }
   ];
 
   return (
@@ -122,6 +147,83 @@ const TripDetail = ({ loaderData }: Route.ComponentProps) => {
             </li>
           </ul>
         </section>
+        <section className="title">
+          <article>
+            <h3>
+              {duration}-Day {country} {travelStyle} Trip
+            </h3>
+            <p>
+              {budget}, {groupType} and {interests}
+            </p>
+          </article>
+
+          <h2>{estimatedPrice}</h2>
+        </section>
+
+        <p className="text-sm md:text-lg font-normal text-dark-400">
+          {description}
+        </p>
+
+        <ul className="itinerary">
+          {itinerary?.map((dayPlan: DayPlan, index: number) => (
+            <li key={index}>
+              <h3>
+                {dayPlan.day}: {dayPlan.location}
+              </h3>
+
+              <ul>
+                {dayPlan.activities.map((activity, index: number) => (
+                  <li key={index}>
+                    <span>{activity.time}</span>
+                    <p>{activity.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+
+        {vistTimeAndWeatherInfo.map((section) => (
+          <div key={section.title} className="visit">
+            <h3>{section.title}</h3>
+
+            <ul>
+              {section.items?.map((item) => (
+                <li key={item}>
+                  <p className="flex-grow">{item}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
+
+        <div className="trip-grid">
+          {allTrips.map(
+            ({
+              id,
+              name,
+              imageUrls,
+              itinerary,
+              travelStyle,
+              interests,
+              estimatedPrice
+            }) => (
+              <TripCard
+                key={id}
+                id={id}
+                name={name}
+                imageUrl={imageUrls[0]}
+                location={itinerary?.[0].location ?? ""}
+                tags={[interests, travelStyle]}
+                price={estimatedPrice}
+              />
+            )
+          )}
+        </div>
       </section>
     </main>
   );
