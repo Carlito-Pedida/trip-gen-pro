@@ -96,6 +96,7 @@ declare interface TrendResult {
 }
 
 declare interface DashboardStats {
+  // allTrips: any;
   totalUsers: number;
   usersJoined: {
     currentMonth: number;
