@@ -1,6 +1,22 @@
+import { RootNavbar } from "components";
 import React from "react";
-import { Link, useNavigate } from "react-router";
-import { logoutUser } from "~/appwrite/ auth";
+import { Link, Outlet, redirect, useNavigate } from "react-router";
+import { getExistingUser, logoutUser, storeUserData } from "~/appwrite/ auth";
+import { account } from "~/appwrite/client";
+
+export async function clientLoader() {
+  try {
+    const user = await account.get();
+
+    if (!user.$id) return redirect("/sign-in");
+
+    const existingUser = await getExistingUser(user.$id);
+    return existingUser?.$id ? existingUser : await storeUserData();
+  } catch (error) {
+    console.log("Error fetching user", error);
+    return redirect("/sign-in");
+  }
+}
 
 const PageLayout = () => {
   const navigate = useNavigate();
@@ -9,23 +25,10 @@ const PageLayout = () => {
     navigate("/sign-in");
   };
   return (
-    <main className="">
-      <div className="flex mt-10 justify-center ">
-        <button
-          onClick={handleLogout}
-          className="cursor-pointer border border-amber-500 px-3 me-3 rounded-md"
-        >
-          <img src="/assets/icons/logout.svg" alt="logout" className="size-6" />
-        </button>
-
-        <Link
-          to={"/dashboard"}
-          className="cursor-pointer bg-primary-100 !text-white rounded-md px-7 py-2 "
-        >
-          Go To Dashboard
-        </Link>
-      </div>
-    </main>
+    <div className="bg-light-200">
+      <RootNavbar />
+      <Outlet />
+    </div>
   );
 };
 
