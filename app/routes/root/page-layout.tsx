@@ -19,11 +19,6 @@ export async function clientLoader() {
 }
 
 const PageLayout = () => {
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    await logoutUser();
-    navigate("/sign-in");
-  };
   return (
     <div className="bg-light-200">
       <RootNavbar />

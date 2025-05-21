@@ -38,19 +38,19 @@ const RootNavbar = () => {
           <h1>Trip Gen AI</h1>
         </Link>
         <aside>
-          {user.status === "admin" && (
+          {user?.status === "admin" && (
             <Link
+              to="/dashboard"
               className={cn("text-base font-normal text-white", {
                 "text-dark-100": location.pathname.startsWith("/travel")
               })}
-              to="/dashboard"
             >
               Admin Panel
             </Link>
           )}
 
           <img
-            src={user?.imageUrl || "/assets/images/david.webp"}
+            src={user?.imageUrl || "/assets/icons/logo.svg"}
             alt={user?.name}
             referrerPolicy="no-referrer"
           />
