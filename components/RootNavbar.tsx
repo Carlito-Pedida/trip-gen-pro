@@ -50,7 +50,7 @@ const RootNavbar = () => {
           )}
 
           <img
-            src={user?.imageUrl || "/assets/icons/logo.svg"}
+            src={user?.imageUrl || "/assets/images/person.png"}
             alt={user?.name}
             referrerPolicy="no-referrer"
           />
