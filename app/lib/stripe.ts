@@ -29,7 +29,7 @@ export const createProduct = async (
     after_completion: {
       type: "redirect",
       redirect: {
-        url: `https://trip-gen-pro.vercel.app/travel/${tripId}/success`
+        url: `${process.env.VITE_BASE_URL}/travel/${tripId}/success`
       }
     }
   });
